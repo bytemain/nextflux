@@ -265,18 +265,18 @@ export async function markAllAsRead(type = "all", id = null) {
   }
 }
 
-// Mark articles above a specific article as read
+// Mark articles above a specific article as read (including the current article)
 export async function markAboveAsRead(articleId) {
   const articles = filteredArticles.get();
   const articleIndex = articles.findIndex((a) => a.id === articleId);
   
-  if (articleIndex <= 0) {
-    return; // No articles above
+  if (articleIndex < 0) {
+    return; // Article not found
   }
   
-  // Get all articles above the current one that are unread
+  // Get all articles above and including the current one that are unread
   const articlesToMark = articles
-    .slice(0, articleIndex)
+    .slice(0, articleIndex + 1)
     .filter((article) => article.status !== "read");
   
   if (articlesToMark.length === 0) {

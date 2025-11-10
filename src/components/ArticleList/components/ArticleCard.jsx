@@ -18,7 +18,7 @@ import React from "react";
 import { useStore } from "@nanostores/react";
 import { settingsState } from "@/stores/settingsStore";
 import { feeds } from "@/stores/feedsStore";
-import { Ripple, useRipple } from "@heroui/react";
+import { Ripple, useRipple, Button } from "@heroui/react";
 import FeedIcon from "@/components/ui/FeedIcon.jsx";
 import { useTranslation } from "react-i18next";
 import {
@@ -33,6 +33,7 @@ export default function ArticleCard({ article }) {
   const navigate = useNavigate();
   const { articleId } = useParams();
   const cardRef = useRef(null);
+  const triggerRef = useRef(null);
   const $feeds = useStore(feeds);
   const {
     markAsReadOnScroll,
@@ -111,11 +112,6 @@ export default function ArticleCard({ article }) {
   };
 
   const handleClick = (e) => {
-    // Don't navigate if dropdown is open
-    if (isDropdownOpen) {
-      return;
-    }
-    
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -138,21 +134,20 @@ export default function ArticleCard({ article }) {
   };
 
   return (
-    <Dropdown isOpen={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-      <DropdownTrigger>
-        <div
-          ref={cardRef}
-          className={cn(
-            "cursor-pointer select-none overflow-hidden p-2 rounded-xl",
-            "relative transform-gpu transition-background duration-200",
-            "bg-transparent contain-content",
-            "hover:bg-background/70",
-            parseInt(articleId) === article.id && "bg-background/70 shadow-custom",
-          )}
-          data-article-id={article.id}
-          onClick={handleClick}
-          onContextMenu={handleContextMenu}
-        >
+    <>
+      <div
+        ref={cardRef}
+        className={cn(
+          "cursor-pointer select-none overflow-hidden p-2 rounded-xl",
+          "relative transform-gpu transition-background duration-200",
+          "bg-transparent contain-content",
+          "hover:bg-background/70",
+          parseInt(articleId) === article.id && "bg-background/70 shadow-custom",
+        )}
+        data-article-id={article.id}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+      >
           <Ripple
             ripples={ripples}
             onClear={onClear}
@@ -242,36 +237,41 @@ export default function ArticleCard({ article }) {
             </div>
           </div>
         </div>
-      </DropdownTrigger>
-      <DropdownMenu aria-label="Article actions">
-        <DropdownItem
-          key="markAbove"
-          onPress={() => {
-            handleMarkAboveAsRead(article.id);
-            setIsDropdownOpen(false);
-          }}
-        >
-          {t("common.markAboveAsRead")}
-        </DropdownItem>
-        <DropdownItem
-          key="toggleRead"
-          onPress={() => {
-            handleMarkStatus(article);
-            setIsDropdownOpen(false);
-          }}
-        >
-          {article.status === "read" ? t("common.markAsUnread") : t("common.markAsRead")}
-        </DropdownItem>
-        <DropdownItem
-          key="markBelow"
-          onPress={() => {
-            handleMarkBelowAsRead(article.id);
-            setIsDropdownOpen(false);
-          }}
-        >
-          {t("common.markBelowAsRead")}
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+      
+      <Dropdown isOpen={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        <DropdownTrigger>
+          <Button ref={triggerRef} className="hidden" />
+        </DropdownTrigger>
+        <DropdownMenu aria-label="Article actions">
+          <DropdownItem
+            key="markAbove"
+            onPress={() => {
+              handleMarkAboveAsRead(article.id);
+              setIsDropdownOpen(false);
+            }}
+          >
+            {t("common.markAboveAsRead")}
+          </DropdownItem>
+          <DropdownItem
+            key="toggleRead"
+            onPress={() => {
+              handleMarkStatus(article);
+              setIsDropdownOpen(false);
+            }}
+          >
+            {article.status === "read" ? t("common.markAsUnread") : t("common.markAsRead")}
+          </DropdownItem>
+          <DropdownItem
+            key="markBelow"
+            onPress={() => {
+              handleMarkBelowAsRead(article.id);
+              setIsDropdownOpen(false);
+            }}
+          >
+            {t("common.markBelowAsRead")}
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    </>
   );
 }
