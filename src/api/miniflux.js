@@ -190,7 +190,7 @@ export const getAllStarredEntries = async () => {
 export const fetchEntryContent = async (entryId) => {
   try {
     const response = await apiClient.get(
-      `/v1/entries/${entryId}/fetch-content`,
+      `/v1/entries/${entryId}/fetch-content?update_content=1`,
     );
     return response.data.content;
   } catch (error) {
