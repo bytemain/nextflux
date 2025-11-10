@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,13 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar.jsx";
 import FeedIcon from "@/components/ui/FeedIcon";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-} from "@heroui/react";
+import { ContextMenu, ContextMenuItem } from "@/components/ui/ContextMenu";
 import { useTranslation } from "react-i18next";
 import { handleRefresh } from "@/handlers/feedHandlers";
 import { handleMarkAllRead } from "@/handlers/articleHandlers";
@@ -26,12 +20,18 @@ const FeedItem = ({ feed }) => {
   const { isMobile, setOpenMobile } = useSidebar();
   const { feedId } = useParams();
   const $getFeedCount = useStore(getFeedCount);
-  const [isOpen, setIsOpen] = useState(false);
-  const triggerRef = useRef(null);
+  const [contextMenu, setContextMenu] = useState({ isOpen: false, position: { x: 0, y: 0 } });
 
   const handleContextMenu = (e) => {
     e.preventDefault();
-    setIsOpen(true);
+    setContextMenu({
+      isOpen: true,
+      position: { x: e.clientX, y: e.clientY }
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ isOpen: false, position: { x: 0, y: 0 } });
   };
 
   return (
@@ -64,33 +64,28 @@ const FeedItem = ({ feed }) => {
         </Link>
       </SidebarMenuSubButton>
       
-      <Dropdown isOpen={isOpen} onOpenChange={setIsOpen}>
-        <DropdownTrigger>
-          <div>
-            <Button ref={triggerRef} className="hidden" />
-          </div>
-        </DropdownTrigger>
-        <DropdownMenu aria-label="Feed actions">
-          <DropdownItem
-            key="refresh"
-            onPress={() => {
-              handleRefresh(feed.id);
-              setIsOpen(false);
-            }}
-          >
-            {t("common.refresh")}
-          </DropdownItem>
-          <DropdownItem
-            key="markAllRead"
-            onPress={() => {
-              handleMarkAllRead("feed", feed.id);
-              setIsOpen(false);
-            }}
-          >
-            {t("common.markAllRead")}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      <ContextMenu 
+        isOpen={contextMenu.isOpen} 
+        onClose={closeContextMenu}
+        position={contextMenu.position}
+      >
+        <ContextMenuItem
+          onClick={() => {
+            handleRefresh(feed.id);
+            closeContextMenu();
+          }}
+        >
+          {t("common.refresh")}
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            handleMarkAllRead("feed", feed.id);
+            closeContextMenu();
+          }}
+        >
+          {t("common.markAllRead")}
+        </ContextMenuItem>
+      </ContextMenu>
     </SidebarMenuSubItem>
   );
 };

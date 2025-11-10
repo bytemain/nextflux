@@ -13,27 +13,20 @@ import {
   handleMarkAboveAsRead,
   handleMarkBelowAsRead,
 } from "@/handlers/articleHandlers.js";
-import { useEffect, useMemo, useRef } from "react";
-import React from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { settingsState } from "@/stores/settingsStore";
 import { feeds } from "@/stores/feedsStore";
-import { Ripple, useRipple, Button } from "@heroui/react";
+import { Ripple, useRipple } from "@heroui/react";
 import FeedIcon from "@/components/ui/FeedIcon.jsx";
 import { useTranslation } from "react-i18next";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/react";
+import { ContextMenu, ContextMenuItem } from "@/components/ui/ContextMenu";
 
 export default function ArticleCard({ article }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { articleId } = useParams();
   const cardRef = useRef(null);
-  const triggerRef = useRef(null);
   const $feeds = useStore(feeds);
   const {
     markAsReadOnScroll,
@@ -45,7 +38,7 @@ export default function ArticleCard({ article }) {
   } = useStore(settingsState);
   const hasBeenVisible = useRef(false);
   const { ripples, onClear, onPress } = useRipple();
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [contextMenu, setContextMenu] = useState({ isOpen: false, position: { x: 0, y: 0 } });
 
   const imageUrl = useMemo(() => extractFirstImage(article), [article]);
   const feedTitle = useMemo(() => {
@@ -130,7 +123,14 @@ export default function ArticleCard({ article }) {
 
   const handleContextMenu = (e) => {
     e.preventDefault();
-    setIsDropdownOpen(true);
+    setContextMenu({
+      isOpen: true,
+      position: { x: e.clientX, y: e.clientY }
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ isOpen: false, position: { x: 0, y: 0 } });
   };
 
   return (
@@ -238,42 +238,36 @@ export default function ArticleCard({ article }) {
           </div>
         </div>
       
-      <Dropdown isOpen={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownTrigger>
-          <div>
-            <Button ref={triggerRef} className="hidden" />
-          </div>
-        </DropdownTrigger>
-        <DropdownMenu aria-label="Article actions">
-          <DropdownItem
-            key="markAbove"
-            onPress={() => {
-              handleMarkAboveAsRead(article.id);
-              setIsDropdownOpen(false);
-            }}
-          >
-            {t("common.markAboveAsRead")}
-          </DropdownItem>
-          <DropdownItem
-            key="toggleRead"
-            onPress={() => {
-              handleMarkStatus(article);
-              setIsDropdownOpen(false);
-            }}
-          >
-            {article.status === "read" ? t("common.markAsUnread") : t("common.markAsRead")}
-          </DropdownItem>
-          <DropdownItem
-            key="markBelow"
-            onPress={() => {
-              handleMarkBelowAsRead(article.id);
-              setIsDropdownOpen(false);
-            }}
-          >
-            {t("common.markBelowAsRead")}
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      <ContextMenu 
+        isOpen={contextMenu.isOpen} 
+        onClose={closeContextMenu}
+        position={contextMenu.position}
+      >
+        <ContextMenuItem
+          onClick={() => {
+            handleMarkAboveAsRead(article.id);
+            closeContextMenu();
+          }}
+        >
+          {t("common.markAboveAsRead")}
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            handleMarkStatus(article);
+            closeContextMenu();
+          }}
+        >
+          {article.status === "read" ? t("common.markAsUnread") : t("common.markAsRead")}
+        </ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            handleMarkBelowAsRead(article.id);
+            closeContextMenu();
+          }}
+        >
+          {t("common.markBelowAsRead")}
+        </ContextMenuItem>
+      </ContextMenu>
     </>
   );
 }
