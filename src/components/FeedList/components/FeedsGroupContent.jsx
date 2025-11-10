@@ -26,8 +26,18 @@ import { useSidebar } from "@/components/ui/sidebar.jsx";
 import FeedIcon from "@/components/ui/FeedIcon";
 import { settingsState } from "@/stores/settingsStore";
 import { useEffect } from "react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
+import { useTranslation } from "react-i18next";
+import { handleRefresh } from "@/handlers/feedHandlers";
+import { handleMarkAllRead } from "@/handlers/articleHandlers";
 
 const FeedsGroupContent = ({ category }) => {
+  const { t } = useTranslation();
   const $getCategoryCount = useStore(getCategoryCount);
   const $getFeedCount = useStore(getFeedCount);
   const { isMobile, setOpenMobile } = useSidebar();
@@ -86,32 +96,51 @@ const FeedsGroupContent = ({ category }) => {
           <SidebarMenuSub className="m-0 px-0 border-none">
             {category.feeds.map((feed) => (
               <SidebarMenuSubItem key={feed.id}>
-                <SidebarMenuSubButton
-                  asChild
-                  className={cn(
-                    "pl-8 pr-2 h-8",
-                    parseInt(feedId) === feed.id &&
-                      "active-feed bg-default/60 rounded-md",
-                  )}
-                >
-                  <Link
-                    to={`/feed/${feed.id}`}
-                    onClick={() => isMobile && setOpenMobile(false)}
-                  >
-                    <FeedIcon feedId={feed.id} />
-                    <span className="flex-1 flex items-center gap-1">
-                      {feed.parsing_error_count > 0 && (
-                        <span className="text-warning">
-                          <TriangleAlert className="size-4" />
-                        </span>
+                <Dropdown>
+                  <DropdownTrigger>
+                    <SidebarMenuSubButton
+                      asChild
+                      className={cn(
+                        "pl-8 pr-2 h-8",
+                        parseInt(feedId) === feed.id &&
+                          "active-feed bg-default/60 rounded-md",
                       )}
-                      <span className="line-clamp-1">{feed.title}</span>
-                    </span>
-                    <span className="text-default-400 text-xs">
-                      {$getFeedCount(feed.id) !== 0 && $getFeedCount(feed.id)}
-                    </span>
-                  </Link>
-                </SidebarMenuSubButton>
+                      onContextMenu={(e) => e.preventDefault()}
+                    >
+                      <Link
+                        to={`/feed/${feed.id}`}
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
+                        <FeedIcon feedId={feed.id} />
+                        <span className="flex-1 flex items-center gap-1">
+                          {feed.parsing_error_count > 0 && (
+                            <span className="text-warning">
+                              <TriangleAlert className="size-4" />
+                            </span>
+                          )}
+                          <span className="line-clamp-1">{feed.title}</span>
+                        </span>
+                        <span className="text-default-400 text-xs">
+                          {$getFeedCount(feed.id) !== 0 && $getFeedCount(feed.id)}
+                        </span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </DropdownTrigger>
+                  <DropdownMenu aria-label="Feed actions">
+                    <DropdownItem
+                      key="refresh"
+                      onPress={() => handleRefresh(feed.id)}
+                    >
+                      {t("common.refresh")}
+                    </DropdownItem>
+                    <DropdownItem
+                      key="markAllRead"
+                      onPress={() => handleMarkAllRead("feed", feed.id)}
+                    >
+                      {t("common.markAllRead")}
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </SidebarMenuSubItem>
             ))}
           </SidebarMenuSub>
