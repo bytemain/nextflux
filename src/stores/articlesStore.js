@@ -351,7 +351,7 @@ export async function markBelowAsRead(articleId) {
   
   // Get all articles below the current one that are unread
   const articlesToMark = articles
-    .slice(articleIndex + 1)
+    .slice(articleIndex)
     .filter((article) => article.status !== "read");
   
   if (articlesToMark.length === 0) {

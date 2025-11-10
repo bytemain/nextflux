@@ -240,7 +240,9 @@ export default function ArticleCard({ article }) {
       
       <Dropdown isOpen={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownTrigger>
-          <Button ref={triggerRef} className="hidden" />
+          <div>
+            <Button ref={triggerRef} className="hidden" />
+          </div>
         </DropdownTrigger>
         <DropdownMenu aria-label="Article actions">
           <DropdownItem

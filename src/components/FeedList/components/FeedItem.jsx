@@ -66,7 +66,9 @@ const FeedItem = ({ feed }) => {
       
       <Dropdown isOpen={isOpen} onOpenChange={setIsOpen}>
         <DropdownTrigger>
-          <Button ref={triggerRef} className="hidden" />
+          <div>
+            <Button ref={triggerRef} className="hidden" />
+          </div>
         </DropdownTrigger>
         <DropdownMenu aria-label="Feed actions">
           <DropdownItem
