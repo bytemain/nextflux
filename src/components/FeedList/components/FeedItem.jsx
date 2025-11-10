@@ -43,11 +43,11 @@ const FeedItem = ({ feed }) => {
           parseInt(feedId) === feed.id &&
             "active-feed bg-default/60 rounded-md",
         )}
-        onContextMenu={handleContextMenu}
       >
         <Link
           to={`/feed/${feed.id}`}
           onClick={() => isMobile && setOpenMobile(false)}
+          onContextMenu={handleContextMenu}
         >
           <FeedIcon feedId={feed.id} />
           <span className="flex-1 flex items-center gap-1">
