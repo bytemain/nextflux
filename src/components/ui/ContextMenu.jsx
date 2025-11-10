@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 const ContextMenu = ({ isOpen, onClose, position, children }) => {
@@ -64,7 +65,7 @@ const ContextMenu = ({ isOpen, onClose, position, children }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div
       ref={menuRef}
       className={cn(
@@ -78,7 +79,8 @@ const ContextMenu = ({ isOpen, onClose, position, children }) => {
       }}
     >
       {children}
-    </div>
+    </div>,
+    document.body
   );
 };
 
