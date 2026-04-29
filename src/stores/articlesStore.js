@@ -17,7 +17,9 @@ export const loading = atom(false); // 加载文章列表
 export const loadingMore = atom(false); // 加载更多文章
 export const loadingOriginContent = atom(false);
 export const error = atom(null);
-export const filter = atom("all");
+export const filter = atom(
+  settingsState.get().showUnreadByDefault ? "unread" : "all",
+);
 export const imageGalleryActive = atom(false);
 export const hasMore = atom(true);
 export const currentPage = atom(1);

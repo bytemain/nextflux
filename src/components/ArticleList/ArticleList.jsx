@@ -20,7 +20,7 @@ import Indicator from "@/components/ArticleList/components/Indicator.jsx";
 import { cn } from "@heroui/react";
 
 const ArticleList = () => {
-  const { feedId, categoryId } = useParams();
+  const { feedId, categoryId, articleId } = useParams();
   const $filteredArticles = useStore(filteredArticles);
   const $filter = useStore(filter);
   const $lastSync = useStore(lastSync);
@@ -88,10 +88,10 @@ const ArticleList = () => {
 
   // 组件挂载时设置默认过滤器
   useEffect(() => {
-    if (!feedId && !categoryId && showUnreadByDefault) {
+    if (!articleId && showUnreadByDefault && filter.get() === "all") {
       filter.set("unread");
     }
-  }, []);
+  }, [feedId, categoryId, articleId, showUnreadByDefault]);
 
   return (
     <div className="main-content flex">
