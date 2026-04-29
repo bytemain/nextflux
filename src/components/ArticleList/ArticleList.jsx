@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import {
   filter,
@@ -34,10 +34,17 @@ const ArticleList = () => {
   } = useStore(settingsState);
   const virtuosoRef = useRef(null);
 
+  const defaultFilterKey = useMemo(
+    () => JSON.stringify([feedId, categoryId, articleId, showUnreadByDefault]),
+    [feedId, categoryId, articleId, showUnreadByDefault],
+  );
   const lastSyncTime = useRef(null);
   const lastDefaultFilterKey = useRef(null);
   const currentFilterRef = useRef($filter);
-  currentFilterRef.current = $filter;
+
+  useEffect(() => {
+    currentFilterRef.current = $filter;
+  }, [$filter]);
 
   useEffect(() => {
     // 如果为同步触发刷新且当前文章列表不在顶部，则暂时不刷新列表，防止位置发生位移
@@ -91,10 +98,6 @@ const ArticleList = () => {
 
   // 组件挂载时设置默认过滤器
   useEffect(() => {
-    const defaultFilterKey = `${feedId || ""}:${categoryId || ""}:${
-      articleId || ""
-    }:${String(showUnreadByDefault)}`;
-
     if (lastDefaultFilterKey.current === defaultFilterKey) {
       return;
     }
@@ -107,7 +110,7 @@ const ArticleList = () => {
     ) {
       filter.set("unread");
     }
-  }, [feedId, categoryId, articleId, showUnreadByDefault]);
+  }, [articleId, defaultFilterKey, showUnreadByDefault]);
 
   return (
     <div className="main-content flex">
