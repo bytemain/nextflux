@@ -36,6 +36,11 @@ const ArticleList = () => {
 
   const lastSyncTime = useRef(null);
   const lastDefaultFilterKey = useRef(null);
+  const currentFilterRef = useRef($filter);
+
+  useEffect(() => {
+    currentFilterRef.current = $filter;
+  }, [$filter]);
 
   useEffect(() => {
     // 如果为同步触发刷新且当前文章列表不在顶部，则暂时不刷新列表，防止位置发生位移
@@ -89,22 +94,26 @@ const ArticleList = () => {
 
   // 组件挂载时设置默认过滤器
   useEffect(() => {
-    const defaultFilterKey = [
+    const defaultFilterKey = JSON.stringify([
       feedId || "",
       categoryId || "",
       articleId || "",
       showUnreadByDefault,
-    ].join(":");
+    ]);
 
     if (lastDefaultFilterKey.current === defaultFilterKey) {
       return;
     }
     lastDefaultFilterKey.current = defaultFilterKey;
 
-    if (!articleId && showUnreadByDefault && $filter === "all") {
+    if (
+      !articleId &&
+      showUnreadByDefault &&
+      currentFilterRef.current === "all"
+    ) {
       filter.set("unread");
     }
-  }, [feedId, categoryId, articleId, showUnreadByDefault, $filter]);
+  }, [feedId, categoryId, articleId, showUnreadByDefault]);
 
   return (
     <div className="main-content flex">
