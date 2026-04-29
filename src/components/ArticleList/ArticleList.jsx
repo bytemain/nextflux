@@ -35,6 +35,7 @@ const ArticleList = () => {
   const virtuosoRef = useRef(null);
 
   const lastSyncTime = useRef(null);
+  const lastDefaultFilterKey = useRef(null);
 
   useEffect(() => {
     // 如果为同步触发刷新且当前文章列表不在顶部，则暂时不刷新列表，防止位置发生位移
@@ -88,10 +89,22 @@ const ArticleList = () => {
 
   // 组件挂载时设置默认过滤器
   useEffect(() => {
-    if (!articleId && showUnreadByDefault && filter.get() === "all") {
+    const defaultFilterKey = [
+      feedId || "",
+      categoryId || "",
+      articleId || "",
+      showUnreadByDefault,
+    ].join(":");
+
+    if (lastDefaultFilterKey.current === defaultFilterKey) {
+      return;
+    }
+    lastDefaultFilterKey.current = defaultFilterKey;
+
+    if (!articleId && showUnreadByDefault && $filter === "all") {
       filter.set("unread");
     }
-  }, [feedId, categoryId, articleId, showUnreadByDefault]);
+  }, [feedId, categoryId, articleId, showUnreadByDefault, $filter]);
 
   return (
     <div className="main-content flex">
