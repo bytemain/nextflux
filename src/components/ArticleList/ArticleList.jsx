@@ -86,12 +86,12 @@ const ArticleList = () => {
     $lastSync,
   ]);
 
-  // 组件挂载时设置默认过滤器
+  // 进入文章列表时设置默认过滤器
   useEffect(() => {
-    if (!feedId && !categoryId && showUnreadByDefault) {
+    if (showUnreadByDefault && filter.get() !== "unread") {
       filter.set("unread");
     }
-  }, []);
+  }, [feedId, categoryId, showUnreadByDefault]);
 
   return (
     <div className="main-content flex">
